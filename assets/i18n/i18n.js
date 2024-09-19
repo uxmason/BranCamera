@@ -3,12 +3,10 @@ import {initReactI18next} from 'react-i18next';
 import commonKr from './kr.json';
 
 i18n.use(initReactI18next).init({
-  compatibilityJSON: 'v3',
   lng: 'kr',
-  fallbackLng: 'en',
-  debug: true,
+  fallbackLng: 'kr',
   resources: {
-    kr: {common: commonKr},
+    kr: {translation: commonKr},
   },
   interpolation: {
     escapeValue: false,
