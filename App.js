@@ -7,8 +7,11 @@ import Root from './pages/Root';
 import {I18nextProvider, useTranslation} from 'react-i18next';
 import i18n from 'i18next';
 import commonKr from './assets/i18n/kr.json';
-import {Text, View} from 'react-native';
+import {BackHandler, Text, View} from 'react-native';
 import {FONTSIZES} from './assets/values/fontSizes';
+import axios from 'axios';
+import PreventRoot from './pages/PreventRoot';
+import LoadingRoot from './pages/LoadingRoot';
 // import eventBus from './class/EventBus';
 
 i18n.init({
@@ -30,8 +33,66 @@ i18n.init({
 export const AppContext = createContext();
 
 export default function App() {
+  const [isAllClear, setAllClear] = useState(false);
+  const [isLoaded, setLoaded] = useState(true);
   DeviceInfo.getUniqueId().then(uniqueId => {
     GlobalFunctions.device = uniqueId;
+    axios.get('https://api64.ipify.org?format=json')
+    .then(response => {
+      boostCheckVersion(response.data.ip);
+    })
+    .catch(error => {
+      console.error('Unable to get IP address', error);
+    });
+
+    const boostCheckVersion = async (ip) => {
+      try {
+        let json;
+        let url =
+          `http://mc365reviewsystem.koreacentral.cloudapp.azure.com/api/app/checkVersion/?ip=${ip}`;
+        const response = await fetch(url, {
+          method: 'GET',
+        });
+        if (response.ok) {
+          json = await response.json();
+          if (json != null) {
+            if (json.success) {
+              setAllClear(json.version === DeviceInfo.getVersion());
+              setLoaded(false);
+            } else {
+              Toast.show({
+                type: 'error',
+                text1: json.message,
+              });
+              // setTimeout(() => {
+              //   BackHandler.exitApp();
+              // }, 5000);
+            }
+          } else {
+            Toast.show({
+              type: 'error',
+              text1: t('server_connect_check'),
+            });
+            setLoaded(false);
+          }
+        } else {
+          Toast.show({
+            type: 'error',
+            text1: '서버 응답 오류',
+            text2: response.statusText,
+          });
+          setLoaded(false);
+        }
+      } catch (e) {
+        Toast.show({
+          type: 'error',
+          text1: e.name,
+          text2: e.message,
+        });
+        console.log(e.message);
+        setCountUploading([]);
+      }
+    }
   });
   const [countUploading, setCountUploading] = useState([]);
   const {t} = useTranslation('common');
@@ -132,7 +193,7 @@ export default function App() {
   return (
     <AppContext.Provider value={{boostAppUploadPhoto}}>
       <I18nextProvider i18n={i18n}>
-        <Root />
+        {isAllClear ? <Root /> : isLoaded ? <LoadingRoot /> : <PreventRoot />}
         <Toast
           config={{
             position: 'bottom',

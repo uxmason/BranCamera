@@ -77,5 +77,7 @@
         "next_camera_pose":"다음 촬영 포즈",
         "next_camera_pose_comment":"해당 부위의 마지막 포즈입니다.",
         "random_camera_pose_comment":"임의의 포즈를 촬영합니다.",
-        "prevent_continuous_comment":"촬영 후 연속촬영을 원하지 않는 경우 뒤로가기 하시면 됩니다."
+        "prevent_continuous_comment":"촬영 후 연속촬영을 원하지 않는 경우 뒤로가기 하시면 됩니다.",
+        "new_version_download":"새로운 버전 다운로드 받기",
+        "do_reload":"새로 시작하기"
 }
