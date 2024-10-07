@@ -9,6 +9,7 @@ import {
   View,
   Dimensions,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import {COLORS} from '../assets/values/colors';
 import {useTranslation} from 'react-i18next';
@@ -376,11 +377,39 @@ export default function ManagerTakePicture(props) {
       setLoading(false);
       if (props.route.params.parentIndex != null) {
         if (childIndex < data[props.route.params.parentIndex].list.length - 1) {
-          setChildIndex(childIndex + 1);
-          Toast.show({
-            type: 'success',
-            text1: '사진이 저장되었고, 다음 포즈 촬영을 시작합니다.',
-          });
+          if (data[props.route.params.parentIndex].isEssential[childIndex + 1] === 1) {
+            setChildIndex(childIndex + 1);
+            Toast.show({
+              type: 'success',
+              text1: '사진이 저장되었고, 다음 포즈 촬영을 시작합니다.',
+            });
+          } else {
+            Alert.alert(
+              "다음 촬영 부위는 '필수' 부위가 아닙니다.",
+              "더 이상 촬영이 필요 없는 경우 아래에 '나가기' 버튼을 눌러주세요.",
+              [
+                {
+                  text: "나가기",
+                  onPress: () => {props.navigation.goBack();
+                    Toast.show({
+                      type: 'success',
+                      text1: '첫화면으로 넘어갑니다.',
+                    });
+                  },
+                },
+                {
+                  text: "다음 촬영",
+                  onPress: () => {setChildIndex(childIndex + 1);
+                    Toast.show({
+                      type: 'success',
+                      text1: '사진이 저장되었고, 다음 포즈 촬영을 시작합니다.',
+                    });
+                  },
+                },
+              ],
+              { cancelable: false } // 알림창을 바깥쪽을 터치해도 닫히지 않게 설정
+            );
+          }
         } else {
           props.navigation.goBack();
           Toast.show({
@@ -393,14 +422,6 @@ export default function ManagerTakePicture(props) {
       }
     }
   }, [imageData]);
-
-  const returnDigitDual = n => {
-    if (n < 10) {
-      return '0' + n;
-    } else {
-      return n;
-    }
-  };
 
   return (
     <View

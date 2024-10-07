@@ -7,7 +7,6 @@ import {
   ScrollView,
   Text,
   View,
-  Dimensions,
   TouchableOpacity,
   StatusBar,
 } from 'react-native';
